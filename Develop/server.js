@@ -2,11 +2,15 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const util = require("util");
+const e = require("express");
 
 // the port the app will run on
 const PORT = process.env.PORT || 3001;
 // use express functionality
 const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static("./public"));
 
@@ -28,15 +32,37 @@ app.get("/notes", (req, res) =>
 
 //api route that reads the db.json file and returns saved notes as json
 app.get("/api/notes", (req, res) => {
+  //reads the db.json file and returns the data in a format that can be displayed
   readFile("./db/db.json").then((data) => res.json(JSON.parse(data)));
 });
 
+// function to add a new note
 app.post("/api/notes", (req, res) => {
-  res.json(`${req.method} request received`);
+  // destructures the req.body to help define a new note object
+  const { title, text } = req.body;
 
-  console.info(req.rawHeaders);
+  // defines a new note object
+  if (title && text) {
+    const note = {
+      title,
+      text,
+    };
 
-  console.info(`${req.method} request received`);
+    // reads the db.json file
+    fs.readFile("./db/db.json", "utf8", (err, data) => {
+      // logs error if error
+      if (err) {
+        console.error(err);
+        // if no error, parse the db.json data
+      } else {
+        const parsedData = JSON.parse(data);
+        // add new note to db.json data
+        parsedData.push(note);
+        // overwrite db.json file with string containing old and new data
+        writeFile("./db/db.json", JSON.stringify(parsedData));
+      }
+    });
+  }
 });
 
 // message that displays when server is started
