@@ -1,19 +1,20 @@
-// import the express model
 const express = require("express");
-// importing the path module
 const path = require("path");
-//import file system
 const fs = require("fs");
+const util = require("util");
 
 // the port the app will run on
 const PORT = process.env.PORT || 3001;
 // use express functionality
 const app = express();
 
-// path to db.json
-const savedNotes = require("./db/db.json");
-
 app.use(express.static("./public"));
+
+// path to db.json
+// const savedNotes = require("./db/db.json");
+
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
 // returns the index.html page
 app.get("/", (req, res) =>
@@ -27,7 +28,7 @@ app.get("/notes", (req, res) =>
 
 //api route that reads the db.json file and returns saved notes as json
 app.get("/api/notes", (req, res) => {
-  res.json(savedNotes);
+  readFile("./db/db.json").then((data) => res.json(JSON.parse(data)));
 });
 
 app.post("/api/notes", (req, res) => {
