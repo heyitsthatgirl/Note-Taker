@@ -21,7 +21,7 @@ const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
 // returns the index.html page
-app.get("*", (req, res) =>
+app.get("/", (req, res) =>
   res.sendFile(path.join(__dirname, "Develop/public/index.html"))
 );
 
