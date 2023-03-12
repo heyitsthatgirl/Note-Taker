@@ -1,5 +1,5 @@
 // importing necessary packages and modules
-const express = require("express");
+const express = require("./Develop/node_modules/express");
 const path = require("path");
 const fs = require("fs");
 const util = require("util");
@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // gives access to static files in the public folder
-app.use(express.static("./public"));
+app.use(express.static("Develop/public"));
 
 // simplifying some asynchronous functions to use later
 const readFile = util.promisify(fs.readFile);
@@ -22,12 +22,12 @@ const writeFile = util.promisify(fs.writeFile);
 
 // returns the index.html page
 app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "/public/index.html"))
+  res.sendFile(path.join(__dirname, "Develop/public/index.html"))
 );
 
 // returns the notes.html page
 app.get("/notes", (req, res) =>
-  res.sendFile(path.join(__dirname, "/public/notes.html"))
+  res.sendFile(path.join(__dirname, "Develop/public/notes.html"))
 );
 
 // every wildcard i make breaks the code, not sure what I'm doing wrong
@@ -39,7 +39,7 @@ app.get("/notes", (req, res) =>
 
 //api route that reads the db.json file and returns saved notes as json
 app.get("/api/notes", (req, res) => {
-  readFile("./db/db.json").then((data) => res.json(JSON.parse(data)));
+  readFile("Develop/db/db.json").then((data) => res.json(JSON.parse(data)));
 });
 
 app.post("/api/notes", (req, res) => {
@@ -61,7 +61,7 @@ app.post("/api/notes", (req, res) => {
     };
 
     // reads the db.json file
-    fs.readFile("./db/db.json", "utf8", (err, data) => {
+    fs.readFile("Develop/db/db.json", "utf8", (err, data) => {
       // logs error if error
       if (err) {
         console.error(err);
@@ -72,7 +72,7 @@ app.post("/api/notes", (req, res) => {
         // add new note to db.json data
         parsedData.push(note);
         // overwrite db.json file with string containing old and new data
-        writeFile("./db/db.json", JSON.stringify(parsedData));
+        writeFile("Develop/db/db.json", JSON.stringify(parsedData));
         res.json(note);
       }
     });
@@ -85,7 +85,7 @@ app.delete("/api/notes/:id", (req, res) => {
   const badNote = req.params.id;
 
   // reads the db.json file
-  readFile("./db/db.json").then((data) => {
+  readFile("Develop/db/db.json").then((data) => {
     // parses the data so it's in array/object form
     const parsedData = JSON.parse(data);
     // filter the parsed data and remove any object whose id matches the one we want to delete
@@ -93,7 +93,7 @@ app.delete("/api/notes/:id", (req, res) => {
     // //log the filtered array to make sure the right note has been deleted
     // console.log(newData);
     // overwrite db.json with the filtered data
-    writeFile("./db/db.json", JSON.stringify(newData));
+    writeFile("Develop/db/db.json", JSON.stringify(newData));
     // visually remove the deleted data from the page
     res.json(newData);
   });
